@@ -20,6 +20,8 @@
 #define centerIR 4
 #define leftIR 8
 #define rightIR 7
+#define left2IR A6
+#define right2IR A7
 
 //variables
 volatile long countLeft = 0;
@@ -74,17 +76,24 @@ void setup() {
   pinMode(centerIR, INPUT);
   pinMode(leftIR, INPUT);
   pinMode(rightIR, INPUT);
+  pinMode(left2IR, INPUT);
+  pinMode(right2IR, INPUT);
 
   Serial.begin(9600);
 }
 
-int s0 = analogRead(centerIR);
-int s1 = analogRead(leftIR);
-int s2 = analogRead(rightIR);
+int s0 = 0;
+int s1 = 0;
+int s2 = 0;
+int s3 = 0;
+int s4 = 0;
 
-int speed = 170;
-int turnspeed = 170;
-int turndelta = 50;
+int multiplier = 55;
+
+int speed = 170 + multiplier;
+int turnspeed = 170 + multiplier;
+int turndelta = 50 + multiplier;
+int dampSharp = 120;
 
 int prev =0;
 
@@ -96,29 +105,54 @@ void loop() {
   s1 = digitalRead(leftIR);
   s2 = digitalRead(rightIR);
   s0 = digitalRead(centerIR);
-    if (s1 && s0){
+  s3 = digitalRead(left2IR);
+  s4 = digitalRead(right2IR);
+  if (s0 && s1 && s3)
+  {
     forward(speed, speed);
     delay(80);
-    if (prev == 0) forward(turnspeed, -turnspeed);
-    else forward(turnspeed, 0);
+    forward(turnspeed, -turnspeed);
+    delay(150);
+    prev = -1;
+  } else if (s0 && s2 && s4){
+    forward(speed, speed);
+    delay(80);
+    forward(-turnspeed, turnspeed);
+    delay(150);
+    prev = 1;
+  } else if (s1 && s0){
+    forward(speed, speed);
+    delay(80);
+    // if (prev == 0) forward(turnspeed, -turnspeed);
+    // else 
+    forward(turnspeed, turnspeed);
     delay(150);
     prev = -1;
   } else if(s2 && s0){
     forward(speed, speed);
     delay(80);
-    if (prev == 0) forward(-turnspeed, turnspeed);
-    else forward(0, turnspeed);
+    // if (prev == 0) forward(-turnspeed, turnspeed);
+    // else 
+    forward(0, turnspeed);
     delay(150);
     prev = 1;
   } else if(s1){
-    forward(speed + turndelta, 0);
+    forward(speed + turndelta,dampSharp);
+    if (s3) forward(speed + turndelta, dampSharp/2);
     prev = -2;
   } else if(s2){
-    forward(0, speed + turndelta);
+    forward(dampSharp, speed + turndelta);
+    if (s4) forward(dampSharp/2, speed + turndelta);
     prev = 2;
   } else if(s0){
     forward(speed, speed);
     prev = 0;
+  } else if(s3){
+    forward(turnspeed, -0);
+    prev = -1;
+  } else if (s4){
+    forward(0, turnspeed);
+    prev = 1;
   } else{
     if (prev == -2 || prev == -1){
         forward(turnspeed, -turnspeed);

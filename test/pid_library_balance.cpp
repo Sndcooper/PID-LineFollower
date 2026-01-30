@@ -26,17 +26,16 @@ volatile long countRight = 0;
 
 unsigned long loop_timer = millis();
 
-double kp = 5.4;
-double ki = .5;
-double kd = 0.35;  //.00002
+double kp = 1.5;
+double ki = 0.001;
+double kd = 0.001;  //.00002
 
 double Setpoint = 0, Input, Output;
 
 long Lcount = 0;
 long Rcount = 0;
-int finalL, finalR = 0;
 
-uint8_t speedBias = 255;
+uint8_t speedBias = 200;
 PID myPID(&Input, &Output, &Setpoint, kp, ki, kd, DIRECT);
 
 void forward(int rightSpeed, int leftSpeed) {
@@ -97,7 +96,7 @@ void setup() {
   loop_timer = millis();
 
   myPID.SetMode(AUTOMATIC);
-  // myPID.SetOutputLimits(-50, 50);
+  myPID.SetOutputLimits(-50, 50);
 
   forward(0, 0);
 }
@@ -107,21 +106,15 @@ void loop() {
     noInterrupts();  // avoiding curroption of interrrupt variables
     Lcount = countLeft;
     Rcount = countRight;
-    // countLeft = 0;
-    // countRight = 0;
+    countLeft = 0;
+    countRight = 0;
     interrupts();
 
     Input = Rcount - Lcount;
 
     myPID.Compute();
-    if(Output > 0){
-      finalL = speedBias - Output;
-      finalR = speedBias;
-    } else {
-      finalR = speedBias + Output;
-      finalL - speedBias;
-    }
-    forward(speedBias + Output, speedBias - Output);
+
+    forward(speedBias - Output, speedBias + Output);
 
     // Serial.print("  Left Count: ");
     Serial.print((float)Lcount);
@@ -129,14 +122,13 @@ void loop() {
     // Serial.print("  Right Count: ");
     Serial.print((float)Rcount);
     // Serial.print("  Correction: ");
-    Serial.print(" ");
-    Serial.print(Output);
+    // Serial.print(correction);
     // Serial.print(" finalR: ");
     // Serial.print(finalR);
     // Serial.print(" finalL: ");
     // Serial.print(finalL);
-    Serial.print(" error: ");
-    Serial.print(Input);
+    // Serial.print(" error: ");
+    // Serial.print(error);
     // Serial.print(" deltaR: ");
     // Serial.print(deltaR);
     // Serial.print(" deltaL: ");
