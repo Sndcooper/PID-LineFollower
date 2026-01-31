@@ -1,9 +1,44 @@
-This folder contains development sketches and tuning experiments for the line follower.
-They are not PlatformIO unit tests—each file is a standalone Arduino sketch used to
-validate sensors, encoders, and PID behavior during iteration.
+# Test & Experiments — The Creative Lab
 
-Highlights:
-- 3-IR and 5-IR line-following logic variants
-- Speed smoothing and overshoot tuning
-- Encoder-only PID balance tests
-- Data logs exported for MATLAB simulation
+This folder is a **sandbox for tuning and validation**. Each sketch here is a standalone Arduino experiment—not a PlatformIO unit test, but a focused trial to verify sensors, tune PID gains, or explore new logic.
+
+---
+
+## 🧪 What Lives Here
+
+### Line Following Variants
+Development of different sensor strategies:
+- **three_ir_working.cpp** — The stable 3‑IR baseline. Fast, simple, reliable.
+- **five_ir_working.cpp** — Extended 5‑IR array for finer edge detection and sharper turns.
+- **five_ir_test.cpp** — Threshold comparison and turn response tuning.
+- **five_ir_smoothing.cpp** — Smooth acceleration/deceleration to reduce jerky transitions.
+- **line_follow_overshoot_tuning.cpp** — Experiments to minimize overshoot on corners.
+
+### PID & Encoder Balancing
+Direct motor and encoder validation:
+- **pid_straight_line.cpp** — Custom PID loop using encoder feedback; keeps motors balanced.
+- **pid_library_balance.cpp** — PID_v1 library baseline for motor synchronization.
+- **pid_library_tuning.cpp** — Higher‑gain PID_v1 runs with detailed output logging.
+- **encoder_forward_test.cc** — Wiring sanity check; confirms motor direction conventions.
+
+### Data & Reference
+- **matlab_sim_data.txt** — Logged encoder/motor values for MATLAB simulation and offline analysis.
+- **encodertestcodes/** — Encoder interrupt utilities and reference code.
+- **MotorTest/** — Arduino Nano CPU benchmark and hardware validation sketches.
+
+---
+
+## 🔬 How to Use
+1. Pick a sketch based on what you want to test (line following, PID tuning, encoder reading).
+2. Upload to the Nano and open Serial Monitor (9600 baud).
+3. Observe sensor outputs, motor speeds, and PID corrections.
+4. Tweak constants and re‑upload to refine behavior.
+5. Save promising results or log data for offline analysis.
+
+---
+
+## 📝 Tips
+- Each sketch is self‑contained; don't mix assumptions from multiple files.
+- Motor direction wiring is consistent across sketches—verify once, trust forever.
+- Use MATLAB to plot the logged data and visualize PID response.
+- Encoder values let you debug motor mismatch without line sensors.
